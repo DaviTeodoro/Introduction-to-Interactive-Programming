@@ -37,11 +37,12 @@ def draw(canvas):
     # update ball
             
     # draw ball
+    canvas.draw_circle((WIDTH/2, HEIGHT/2), BALL_RADIUS, 3, "White", "White")
     
     # update paddle's vertical position, keep paddle on the screen
     
     # draw paddles
-    
+    canvas.draw
     # determine whether paddle and ball collide    
     
     # draw scores
