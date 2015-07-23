@@ -67,7 +67,21 @@ class Hand:
 
     def get_value(self):
         # count aces as 1, if the hand has an ace, then add 10 to hand value if it doesn't bust
-        pass	# compute the value of the hand, see Blackjack video
+        global VALUES
+        self.hand_value = 0
+        self.has_aces = False
+        for i in range(len(self.cards)):
+            self.hand_value += VALUES[self.cards[i].get_rank()]
+            if self.cards[i].get_rank() == 'A':
+                self.has_aces = True
+        if self.has_aces == False:
+            return self.hand_value
+        else:
+            if self.hand_value + 10 <= 21:
+                return self.hand_value+10
+            else:
+                return self.hand_value
+       
    
     def draw(self, canvas, pos):
         pass	# draw a hand on the canvas, use the draw method for cards
@@ -122,14 +136,29 @@ def deal():
     in_play = True
 
 def hit():
-    pass	# replace with your code below
- 
+    global player_hand, deck
+    
+    if player_hand.get_value() < 21:
+        player_hand.add_card(deck.deal_card())
+        print player_hand
+        if player_hand.get_value() > 21:
+            print "you are busted"
     # if the hand is in play, hit the player
    
     # if busted, assign a message to outcome, update in_play and score
        
 def stand():
-    pass	# replace with your code below
+    global player_hand, deck, dealer_hand
+    
+    if player_hand.get_value() < 21:
+        while dealer_hand.get_value() < 17:
+            dealer_hand.add_card(deck.deal_card())
+    else:
+        print 'You are busted'
+    if player_hand.get_value() <= dealer_hand.get_value():
+        print 'you lost'
+    else:
+        print 'you won'
    
     # if hand is in play, repeatedly hit dealer until his hand has value 17 or more
 
