@@ -2,6 +2,7 @@
 
 import simplegui
 import random
+import time
 
 # load card sprite - 936x384 - source: jfitz.com
 CARD_SIZE = (72, 96)
@@ -165,7 +166,6 @@ def hit():
             score += 1
             in_play = False
     # if the hand is in play, hit the player
-   
     # if busted, assign a message to outcome, update in_play and score
        
 def stand():
@@ -191,8 +191,22 @@ def stand():
             score += 1
     in_play = False
     # if hand is in play, repeatedly hit dealer until his hand has value 17 or more
-
     # assign a message to outcome, update in_play and score
+
+def autoplay():
+    global in_play
+    play_cycles = 100
+    
+    for i in range(play_cycles):
+        while in_play:
+            if player_hand.get_value() < 17:
+                while player_hand.get_value() <= 17:
+                    hit()
+            else:
+                stand()
+                print 'debug'
+                deal()
+        in_play = True        
 
 # draw handler    
 def draw(canvas):
@@ -218,8 +232,8 @@ frame.set_canvas_background("Green")
 frame.add_button("Deal", deal, 200)
 frame.add_button("Hit",  hit, 200)
 frame.add_button("Stand", stand, 200)
+frame.add_button("autoplay", autoplay, 200)
 frame.set_draw_handler(draw)
-
 
 # get things rolling
 deal()
