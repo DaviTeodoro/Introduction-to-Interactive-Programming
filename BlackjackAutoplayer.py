@@ -195,10 +195,9 @@ def stand():
 
 def autoplay():
     global in_play
-    play_cycles = 100
+    play_cycles = 1
     
     for i in range(play_cycles):
-        while in_play:
             if player_hand.get_value() < 17:
                 while player_hand.get_value() <= 17:
                     hit()
@@ -206,8 +205,13 @@ def autoplay():
                 stand()
                 print 'debug'
                 deal()
-        in_play = True        
 
+def timer_handler():
+    autoplay()
+
+def autoplay_visual():
+    timer.start()
+    
 # draw handler    
 def draw(canvas):
     global outcome, score, in_play, card_back
@@ -233,7 +237,9 @@ frame.add_button("Deal", deal, 200)
 frame.add_button("Hit",  hit, 200)
 frame.add_button("Stand", stand, 200)
 frame.add_button("autoplay", autoplay, 200)
+frame.add_button("autoplay visual", autoplay_visual, 200)
 frame.set_draw_handler(draw)
+timer = simplegui.create_timer(1000, timer_handler)
 
 # get things rolling
 deal()
