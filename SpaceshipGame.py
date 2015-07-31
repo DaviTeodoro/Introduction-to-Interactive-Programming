@@ -96,16 +96,33 @@ class Ship:
         self.image_center = info.get_center()
         self.image_size = info.get_size()
         self.radius = info.get_radius()
-        
+           
     def draw(self,canvas):
         if not self.thrust:
-            canvas.draw_image(self.image, self.image_center, self.image_size, self.pos, self.image_size, self.angle)
+            canvas.draw_image(self.image, self.image_center, self.image_size, (self.pos[0] % WIDTH , self.pos[1] % HEIGHT), self.image_size, self.angle)
         else:
-            canvas.draw_image(self.image, (self.image_center[0]+90, self.image_center[1]), self.image_size, self.pos, self.image_size, self.angle)
+            canvas.draw_image(self.image, (self.image_center[0]+90, self.image_center[1]), self.image_size, (self.pos[0] % WIDTH , self.pos[1] % HEIGHT), self.image_size, self.angle)
+    
     def update(self):
+        
+        #Position update
         self.pos[0] += self.vel[0]
         self.pos[1] += self.vel[1]
+       
+        #Friction update
+        self.vel[0] *=(1-0.01)
+        self.vel[1] *=(1-0.01)
+
+        
+        #Thruste update, accelerate in direction of forward vector 
+        forward = angle_to_vector(self.angle)
+        if self.thrust:
+            self.vel[0] += forward[0] * (0.2)
+            self.vel[1] += forward[1] * (0.2)
+        
+        #Update the facing angle
         self.angle += self.angle_vel
+
     
     def turn_right(self):
         if self.angle_vel == 0:
@@ -123,10 +140,11 @@ class Ship:
         self.is_on = is_on
         if self.is_on:
             self.thrust = True
+            ship_thrust_sound.play()
 
         else:
             self.thrust = False
-
+            ship_thrust_sound.pause()
     
 # Sprite class
 class Sprite:
@@ -150,7 +168,8 @@ class Sprite:
         canvas.draw_image(self.image, self.image_center, self.image_size, self.pos, self.image_size, self.angle)
     
     def update(self):
-        self.angle += self.angle_vel        
+        self.angle += self.angle_vel    
+
 
 
 # keyhundlers
@@ -200,7 +219,7 @@ def rock_spawner():
 frame = simplegui.create_frame("Asteroids", WIDTH, HEIGHT)
 
 # initialize ship and two sprites
-my_ship = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0.1, ship_image, ship_info)
+my_ship = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info)
 a_rock = Sprite([WIDTH / 3, HEIGHT / 3], [1, 1], 0, 0.1, asteroid_image, asteroid_info)
 a_missile = Sprite([2 * WIDTH / 3, 2 * HEIGHT / 3], [-1,1], 0, 0, missile_image, missile_info, missile_sound)
 
