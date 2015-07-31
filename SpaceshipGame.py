@@ -110,8 +110,8 @@ class Ship:
         self.pos[1] += self.vel[1]
        
         #Friction update
-        self.vel[0] *=(1-0.01)
-        self.vel[1] *=(1-0.01)
+        self.vel[0] *= (1-0.01)
+        self.vel[1] *= (1-0.01)
 
         
         #Thruste update, accelerate in direction of forward vector 
@@ -134,7 +134,7 @@ class Ship:
         if self.angle_vel == 0:
             self.angle_vel -= 0.1
         else:
-            self.angle_vel += -1*self.angle_vel
+            self.angle_vel += -1 * self.angle_vel
     
     def thruster(self, is_on):
         self.is_on = is_on
@@ -145,6 +145,25 @@ class Ship:
         else:
             self.thrust = False
             ship_thrust_sound.pause()
+    
+    def shoot(self):
+        global a_missile
+        
+        forward = angle_to_vector(self.angle)
+        
+        #compute missile's velocity
+        m_vel = [0,0]
+        m_vel[0] = (forward[0] * 10) + self.vel[0]
+        m_vel[1] = (forward[1] * 10) + self.vel[1]
+        
+        #compute missile's position
+        m_pos = [0,0]
+        m_pos[0] = self.pos[0] + (forward[0] * self.radius)
+        m_pos[1] = self.pos[1] + (forward[1] * self.radius)
+        
+        #create missile
+        a_missile = Sprite(m_pos, m_vel, 0, 0, missile_image, missile_info, missile_sound)
+        
     
 # Sprite class
 class Sprite:
@@ -165,10 +184,15 @@ class Sprite:
             sound.play()
    
     def draw(self, canvas):
-        canvas.draw_image(self.image, self.image_center, self.image_size, self.pos, self.image_size, self.angle)
+        canvas.draw_image(self.image, self.image_center, self.image_size, (self.pos[0] % WIDTH , self.pos[1] % HEIGHT), self.image_size, self.angle)
     
     def update(self):
+        #update rotation
         self.angle += self.angle_vel    
+        
+        #update positon
+        self.pos[0] += self.vel[0]
+        self.pos[1] += self.vel[1]
 
 
 
@@ -188,6 +212,8 @@ def keydown(key):
         my_ship.turn_left()   
     elif key == simplegui.KEY_MAP["up"]:
         my_ship.thruster(True)
+    elif key == simplegui.KEY_MAP["space"]:
+        my_ship.shoot()
 
 def draw(canvas):
     global time
@@ -210,11 +236,16 @@ def draw(canvas):
     my_ship.update()
     a_rock.update()
     a_missile.update()
-            
+    
+    #draw user interface
+    canvas.draw_text("LIVES: " + str(lives), (30, 30), 30, 'White', 'monospace')
+    canvas.draw_text("SCORE: " + str(score), (630, 30), 30, 'White', 'monospace')
+    
 # timer handler that spawns a rock    
 def rock_spawner():
-    pass
-    
+    global a_rock
+    a_rock = Sprite([random.randrange(0, WIDTH) , random.randrange(0, HEIGHT)], [random.randrange(-3, 3), random.randrange(-3, 3)], 0, 0.1, asteroid_image, asteroid_info)
+
 # initialize frame
 frame = simplegui.create_frame("Asteroids", WIDTH, HEIGHT)
 
